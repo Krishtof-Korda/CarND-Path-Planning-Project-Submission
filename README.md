@@ -52,7 +52,15 @@ the path has processed since last time.
 
 #### Sensor Fusion Data, a list of all other car's attributes on the same side of the road. (No Noise)
 
-["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates. 
+["sensor_fusion"] A 2d vector of cars and then that car's 
+
+[car's unique ID, 
+car's x position in map coordinates, 
+car's y position in map coordinates, 
+car's vx velocity in m/s, 
+car's vy velocity in m/s, 
+car's s position in frenet coordinates, 
+car's d position in frenet coordinates.] 
 
 ## Details
 
@@ -137,4 +145,170 @@ still be compilable with cmake and make./
 
 ## How to write a README
 A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+
+
+
+
+
+
+// For use later. 
+
+double tandem_car_speed = 0; //KK speed of car in front for use later
+double tandem_car_distance = 100; //KK distance of car in front for use later
+
+for(int i=0; i<sensor_fusion.size(); i++){
+            //Aa car is in my lane
+            float d = sensor_fusion[i][6];
+            if(d<(2+4*Ego.lane+2) && d>(2+4*Ego.lane-2))
+            {
+              double vx = sensor_fusion[i][3];
+              double vy = sensor_fusion[i][4];
+              double check_speed = sqrt(vx*vx + vy*vy);
+              double check_car_s = sensor_fusion[i][5];
+              
+              check_car_s += (double)prev_size*.02*check_speed; //Aaron if using previous point can project s value out
+              //Aaron check s value greater than mine and s gap
+              //KK time gap
+              double react_gap = 0.5*mph2ms(Ego.ref_vel);
+              if(check_car_s > car_s && check_car_s - car_s < react_gap)
+              {
+                //Aaron do some logic here, lower ref vel so we don't crash into the car in front of us
+                // could also flag to try to change lanes.
+                too_close = true;
+                tandem_car_speed = check_speed;
+                tandem_car_distance = fabs(check_car_s - car_s);
+              }
+            }
+          }
+          
+          double k_decel = 2/mph2ms(tandem_car_distance); //KK slow down gain
+          double k_accel = 100*tandem_car_distance; //KK speed up gain
+          double max_accel = mph2ms(.4); //KK max accel or decel
+          
+          if(too_close)
+          {
+            if(Ego.ref_vel > tandem_car_speed)
+            {
+              Ego.ref_vel -= min(k_decel, max_accel);
+            }
+            else
+            {
+              Ego.ref_vel += min(k_accel, max_accel);
+            }
+            for(int i=0; i<sensor_fusion.size(); i++)
+            {              
+              float d = sensor_fusion[i][6];
+              double vx = sensor_fusion[i][3];
+              double vy = sensor_fusion[i][4];
+              double check_speed = sqrt(vx*vx + vy*vy);
+              double check_car_s = sensor_fusion[i][5];
+              check_car_s += (double)prev_size*.02*check_speed;
+              double react_gap = 0.5*check_speed;
+              
+              if(Ego.lane == 1)
+              {
+                if(d<(2+4*Ego.lane+1) && d>(2+4*Ego.lane-1)) //KK car on my left
+                {
+                  if(check_car_s > car_s && check_car_s - car_s < react_gap+1)
+                  {
+                    continue;
+                  }
+                  else if(check_car_s < car_s && car_s - check_car_s < react_gap+1)
+                  {
+                    for(int j=0; j<sensor_fusion.size(); j++)
+                    {
+                      float d = sensor_fusion[j][6];
+                      double vx = sensor_fusion[j][3];
+                      double vy = sensor_fusion[j][4];
+                      double check_speed = sqrt(vx*vx + vy*vy);
+                      double check_car_s = sensor_fusion[j][5];
+                      check_car_s += (double)prev_size*.02*check_speed;
+                      double react_gap = 0.5*check_speed;
+                      
+                      if(d<(2+4*Ego.lane+3) && d>(2+4*Ego.lane-3)) //KK car on my right
+                      {
+                        
+                        if(check_car_s > car_s && check_car_s - car_s < react_gap+1)
+                        {
+                          continue;
+                        }
+                        else if(check_car_s < car_s && car_s - check_car_s < react_gap+1)
+                        {
+                          Ego.lane = 1;
+                        }
+                        else
+                        {
+                          //int a=rand()%2;
+                          //int b = pow(-1,a);
+                          Ego.lane = 2;
+                        }
+                      }
+//                      else{
+//                        lane = 2;
+//                      }
+                    }
+                  }
+                  else
+                  {
+                    Ego.lane = 0;
+                  }
+                }
+//                else{
+//                  lane = 0;
+//                }
+                
+              }
+              else if(Ego.lane == 0)
+              {
+                if(d<(2+4*Ego.lane+3) && d>(2+4*Ego.lane-3)) //KK car on my right
+                {
+                  
+                  if(check_car_s > car_s && check_car_s - car_s < react_gap+1)
+                  {
+                    continue;
+                  }
+                  else if(check_car_s < car_s && car_s - check_car_s < react_gap+1)
+                  {
+                    Ego.lane = 0;
+                  }
+                  else
+                  {
+                    Ego.lane = 1;
+                  }
+                }
+//                else{
+//                  lane = 1;
+//                }
+                
+              }
+              else if(Ego.lane == 2)
+              {
+                if(d<(2+4*Ego.lane+3) && d>(2+4*Ego.lane-3)) //KK car on my left
+                {
+                  
+                  if(check_car_s > car_s && check_car_s - car_s < react_gap+1)
+                  {
+                    continue;
+                  }
+                  else if(check_car_s < car_s && car_s - check_car_s < react_gap+1)
+                  {
+                    Ego.lane = 2;
+                  }
+                  else
+                  {
+                    Ego.lane = 1;
+                  }
+                }
+//                else{
+//                  lane = 1;
+//                }
+                
+              }
+            }
+          }
+          else if(Ego.ref_vel < 49.5)
+          {
+            Ego.ref_vel += max_accel;
+
+          }
 
