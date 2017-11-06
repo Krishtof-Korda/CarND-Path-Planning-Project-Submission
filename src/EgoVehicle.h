@@ -45,15 +45,14 @@ public:
   double react_gap;
   bool clear_left;
   bool clear_right;
-  bool clear_forward;
-  bool clear_rear;
+  bool too_close;
   vector<double> previous_path_x;
   vector<double> previous_path_y;
   int prev_size;
   vector< OtherVehicle > closest_vehicles;
   Trajectory calculated_trajectory;
   RoadMap roadMap;
-  States Maneuver = KL;
+  States Maneuver = CC;
 
   //kk Update the state of Ego given the other vehicles on the road
   void update(vector<double> car_data, vector< vector<double> > previous_path, vector<OtherVehicle> vehicles, vector<double> &next_x_vals, vector<double> &next_y_vals);

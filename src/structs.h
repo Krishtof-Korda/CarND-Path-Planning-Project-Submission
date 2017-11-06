@@ -30,6 +30,7 @@ struct Trajectory{
 };
 
 enum States {
+  CC, // cruise control with no car in front
   KL, // keep lane
   LCL, // lane change left
   LCR, // lane change right
