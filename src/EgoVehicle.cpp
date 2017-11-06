@@ -17,6 +17,10 @@ EgoVehicle::EgoVehicle(RoadMap roadMap){
   this->vel = 0;
   this->roadMap = roadMap;
   this->max_accel = .4; //KK max accel or decel
+  this->clear_left = true;
+  this->clear_right = true;
+  this->clear_forward = true;
+  this->clear_rear = true;
   
 }
 
@@ -66,11 +70,18 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   
   for(int i=0; i<closest_vehicles.size(); i++)
   {
-    //Aa car is in my lane
+    
+    double vx = closest_vehicles[i].vx;
+    double vy = closest_vehicles[i].vy;
+    double check_speed = sqrt(vx*vx + vy*vy);
+    double check_car_s = closest_vehicles[i].s;
     double d = closest_vehicles[i].d;
+    
     //DEBUG
     printf("closest_vehicles[%d].d: %f\n", i, d);
     
+    ///////////////////Check if we have car in our lane//////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////
     if(d<(2+4*this->lane+2) && d>(2+4*this->lane-2))
     {
       
@@ -86,7 +97,8 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
       check_car_s += (double)this->prev_size*.02*check_speed;
       
       //kk reaction gap between car in front based on current speed.
-      this->react_gap = 0.5*this->vel;
+      double react_time = 0.1; // reaction time in seconds
+      this->react_gap = react_time * this->vel;
       
       //DEBUG
       printf("CHECK_CAR_S - S, REACT_GAP: (%f, %f)\n", check_car_s-this->s, react_gap);
@@ -106,18 +118,65 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
         tandem_car_distance = fabs(check_car_s - this->s);
       }
     }
+    
+    ///////////////////Check if we are clear in specific directions//////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////
+    
+    double lane_width = roadMap.lane_width;
+    double half_lane = lane_width/2;
+    double num_lanes = roadMap.num_lanes;
+    double ego_lane_center = lane_width*lane + half_lane;
+    double adjacent_lane = lane_width + half_lane;
+    
+    
+    if(d<ego_lane_center && d>(ego_lane_center - adjacent_lane) && d<0 && d<num_lanes*lane_width) //KK car on my left
+    {
+      if(check_car_s > this->s && check_car_s - this->s < react_gap+car_length/2+car_buffer) //kk car in front on left
+      {
+        clear_left = false;
+        clear_forward = false;
+      }
+      else if(check_car_s < this->s && this->s - check_car_s < react_gap+car_length/2+car_buffer) //kk car behind on left
+      {
+        clear_left = false;
+        clear_rear = false;
+      }
+      else {clear_left = true; clear_forward = true; clear_rear = true;}
+    }
+    
+    if(d>ego_lane_center && d<(ego_lane_center + adjacent_lane) && d<0 && d<num_lanes*lane_width) //KK car on my right
+    {
+      if(check_car_s > this->s && check_car_s - this->s < react_gap+car_length/2+car_buffer) //kk car in front on right
+      {
+        clear_right = false;
+        clear_forward = false;
+      }
+      else if(check_car_s < this->s && this->s - check_car_s < react_gap+car_length/2+car_buffer) //kk car behind on right
+      {
+        clear_right = false;
+        clear_rear = false;
+      }
+      else {clear_right = true; clear_forward = true; clear_rear = true;}
+    
+    }
+    
+    ///////////////////////////////////////////////////////////////
   }
   
   double k_decel = 2/tandem_car_distance; //KK slow down gain
   double k_accel = 100*tandem_car_distance; //KK speed up gain
   
   
-  //kk if vehicle is too close in front do a lane change is possible
+  
+  
+  
+  //kk if vehicle is too close in front do a lane change if possible
   if(too_close)
   {
     //DEBUG
     printf("Vel, tandem speed: (%f, %f)\n", vel, tandem_car_speed);
     
+    /**************Adaptive Cruise Conntrol********************/
     if(this->vel > tandem_car_speed)
     {
       this->vel -= min(k_decel, max_accel);
@@ -126,130 +185,63 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
     {
       this->vel += min(k_accel, max_accel);
     }
-    for(int i=0; i<closest_vehicles.size(); i++)
-    {
-      float d = closest_vehicles[i].d;
-      double vx = closest_vehicles[i].vx;
-      double vy = closest_vehicles[i].vy;
-      double check_speed = sqrt(vx*vx + vy*vy);
-      double check_car_s = closest_vehicles[i].s;
-      
-      //Aa if using previous point can project s value out
-      check_car_s += (double)prev_size*.02*mph2ms(check_speed);
-      
-      //Aa check s value greater than mine and s gap
-      
-      if(this->lane == 1)
-      {
-        if(d<(2+4*this->lane+1) && d>(2+4*this->lane-1)) //KK car on my left
-        {
-          if(check_car_s > this->s && check_car_s - this->s < react_gap+1)
-          {
-            continue;
-          }
-          else if(check_car_s < this->s && this->s - check_car_s < react_gap+1)
-          {
-            for(int j=0; j<closest_vehicles.size(); j++)
-            {
-              float d = closest_vehicles[i].d;
-              double vx = closest_vehicles[i].vx;
-              double vy = closest_vehicles[i].vy;
-              double check_speed = sqrt(vx*vx + vy*vy);
-              double check_car_s = closest_vehicles[i].s;
-              
-              //Aa if using previous point can project s value out
-              check_car_s += (double)prev_size*.02*check_speed;
-              
-              //Aa check s value greater than mine and s gap
-              
-              if(d<(2+4*this->lane+3) && d>(2+4*this->lane-3)) //KK car on my right
-              {
-                
-                if(check_car_s > this->s && check_car_s - this->s < react_gap+1)
-                {
-                  continue;
-                }
-                else if(check_car_s < this->s && this->s - check_car_s < react_gap+1)
-                {
-                  this->lane = 1;
-                }
-                else
-                {
-                  //int a=rand()%2;
-                  //int b = pow(-1,a);
-                  this->lane = 2;
-                }
-              }
-              //                      else{
-              //                        lane = 2;
-              //                      }
-            }
-          }
-          else
-          {
-            this->lane = 0;
-          }
-        }
-        //                else{
-        //                  lane = 0;
-        //                }
-        
-      }
-      else if(this->lane == 0)
-      {
-        if(d<(2+4*this->lane+3) && d>(2+4*this->lane-3)) //KK car on my right
-        {
-          
-          if(check_car_s > this->s && check_car_s - this->s < react_gap+1)
-          {
-            continue;
-          }
-          else if(check_car_s < this->s && this->s - check_car_s < react_gap+1)
-          {
-            this->lane = 0;
-          }
-          else
-          {
-            this->lane = 1;
-          }
-        }
-        //                else{
-        //                  lane = 1;
-        //                }
-        
-      }
-      else if(this->lane == 2)
-      {
-        if(d<(2+4*this->lane+3) && d>(2+4*this->lane-3)) //KK car on my left
-        {
-          
-          if(check_car_s > this->s && check_car_s - this->s < react_gap+1)
-          {
-            continue;
-          }
-          else if(check_car_s < this->s && this->s - check_car_s < react_gap+1)
-          {
-            this->lane = 2;
-          }
-          else
-          {
-            this->lane = 1;
-          }
-        }
-        //                else{
-        //                  lane = 1;
-        //                }
-        
-      }
-    }
+    /***********************************************************/
+    
+    
+    
+    /**************Case Clear Left and Forward********************/
+    if(clear_left && clear_forward) Maneuver=LCL;
+    /***********************************************************/
+    
+    
+    /**************Case Clear Left and Rear********************/
+    if(clear_left && clear_rear) Maneuver=LCL;
+    /***********************************************************/
+    
+    
+    /**************Case Clear Right and Forward********************/
+    if(clear_right && clear_forward) Maneuver=LCR;
+    /***********************************************************/
+    
+    
+    /**************Case Clear Right and Rear********************/
+    if(clear_right && clear_rear) Maneuver=LCR;
+    /***********************************************************/
+    
+    
+    /**************Case Clear Left and Right********************/
+    if(clear_left && clear_right) Maneuver=LCL; //default lane change left
+    /***********************************************************/
+  
   }
   
-  //kk else if we are going to slow speed up
+  //kk else if we are going too slow speed up
   else if(this->vel < this->ref_vel)
   {
     this->vel += max_accel;
     
   }
+  
+  /**************Switch Case to Make Decision********************/
+  switch (Maneuver) {
+    case LCL:
+      lane = max(lane-1, 0);
+      break;
+    
+    case LCR:
+      lane = max(lane+1, 2);
+      break;
+      
+    case KL:
+      lane = lane+0;
+      break;
+      
+    default:
+      break;
+  }
+  /***********************************************************/
+  
+  
   
   //kk Generate the trajectory based on the current target lane
   generate_trajectory();

@@ -37,18 +37,23 @@ public:
   double ref_vel;
   double vel;
   double max_accel; //KK max accel or decel
-  double car_width = 2.0; //kk car width in meters
-  double car_length = 3.0; //kk car length in meters
-  double car_buffer = 0.5; //kk buffer from other cars
+  double car_width = 1.5; //kk car width in meters
+  double car_length = 2.5; //kk car length in meters
+  double car_buffer = 0.1; //kk buffer from other cars
   double end_path_s;
   double end_path_d;
   double react_gap;
+  bool clear_left;
+  bool clear_right;
+  bool clear_forward;
+  bool clear_rear;
   vector<double> previous_path_x;
   vector<double> previous_path_y;
   int prev_size;
   vector< OtherVehicle > closest_vehicles;
   Trajectory calculated_trajectory;
   RoadMap roadMap;
+  States Maneuver = KL;
 
   //kk Update the state of Ego given the other vehicles on the road
   void update(vector<double> car_data, vector< vector<double> > previous_path, vector<OtherVehicle> vehicles, vector<double> &next_x_vals, vector<double> &next_y_vals);
