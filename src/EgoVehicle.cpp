@@ -88,11 +88,6 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
       //DEBUG
       printf("CAR IN MY LANE!!!!........\n");
       
-      double vx = closest_vehicles[i].vx;
-      double vy = closest_vehicles[i].vy;
-      double check_speed = sqrt(vx*vx + vy*vy);
-      double check_car_s = closest_vehicles[i].s;
-      
       //Aa if using previous point can project s value out
       check_car_s += (double)this->prev_size*.02*check_speed;
       
