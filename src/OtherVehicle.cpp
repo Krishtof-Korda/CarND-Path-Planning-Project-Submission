@@ -7,6 +7,7 @@
 
 #include "OtherVehicle.h"
 
+OtherVehicle::OtherVehicle(){}
 
 OtherVehicle::OtherVehicle(int id, double x, double y, double vx, double vy, double s, double d){
   

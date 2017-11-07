@@ -13,6 +13,7 @@
 #include "tools.h"
 #include "structs.h"
 #include "OtherVehicle.h"
+#include "Lane.h"
 //#include "cost_functions.h"
 
 using namespace std;
@@ -58,7 +59,7 @@ public:
   void update(vector<double> car_data, vector< vector<double> > previous_path, vector<OtherVehicle> vehicles, vector<double> &next_x_vals, vector<double> &next_y_vals);
   
   //KK find the closest vehicles
-  void find_closest_vehicles(vector<OtherVehicle> vehicles);
+  void find_vehicles_on_road(vector<Lane> &lanes, vector<OtherVehicle> vehicles);
   
   //KK Generate a spline trajectory for given variables
   Trajectory generate_trajectory();

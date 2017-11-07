@@ -9,6 +9,7 @@
 #define structs_h
 
 #include <vector>
+//#include "OtherVehicle.h"
 
 using namespace std;
 
@@ -23,6 +24,13 @@ struct RoadMap{
   double lane_width; //  meters
   double speed_limit; // mph
 };
+
+//struct Lane{
+//  int id;
+//  vector<OtherVehicle> all_vehicles;
+//  OtherVehicle closest_vehicle;
+//  bool empty = true;
+//};
 
 struct Trajectory{
   vector<double> x_vals;

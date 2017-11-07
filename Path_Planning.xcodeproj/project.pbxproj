@@ -66,6 +66,7 @@
 
 /* Begin PBXFileReference section */
 		2A49BFE1AE41472BB0C08DE7 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		310CB38D1FB1892C00E25A1E /* Lane.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Lane.h; path = src/Lane.h; sourceTree = "<group>"; };
 		311D35D81FAAC99C000B152D /* tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tools.cpp; path = src/tools.cpp; sourceTree = "<group>"; };
 		311D35D91FAAC99C000B152D /* tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tools.h; path = src/tools.h; sourceTree = "<group>"; };
 		311D35DB1FAAD707000B152D /* EgoVehicle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = EgoVehicle.cpp; path = src/EgoVehicle.cpp; sourceTree = "<group>"; };
@@ -104,6 +105,7 @@
 				3139A49F1FAE94C700D7BAB5 /* structs.h */,
 				3139A4A01FAEBB1500D7BAB5 /* OtherVehicle.cpp */,
 				3139A4A11FAEBB1500D7BAB5 /* OtherVehicle.h */,
+				310CB38D1FB1892C00E25A1E /* Lane.h */,
 			);
 			name = "Source Files";
 			sourceTree = "<group>";

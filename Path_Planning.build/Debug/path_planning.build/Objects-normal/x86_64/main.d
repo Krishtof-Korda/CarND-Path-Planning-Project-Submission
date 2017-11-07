@@ -180,4 +180,5 @@ dependencies: \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/spline/src/spline.h \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/EgoVehicle.h \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/structs.h \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/OtherVehicle.h
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/OtherVehicle.h \
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/Lane.h

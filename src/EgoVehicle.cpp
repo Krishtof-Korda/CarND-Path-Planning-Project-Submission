@@ -7,6 +7,7 @@
 
 #include "EgoVehicle.h"
 #include "OtherVehicle.h"
+#include "Lane.h"
 
 
 
@@ -47,8 +48,18 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   
   printf("PREV_SIZE: %d\n", prev_size); //DEBUG
   
-  /////////////////////Find the Vehicle in my vicinity//////////////////////////
-  find_closest_vehicles(vehicles);
+  /////////////////////Declare a vector of Lane structs and initialize////////////////////////
+  vector<Lane> lanes;
+  for(int i=0; i<roadMap.num_lanes; i++){
+    Lane lane;
+    lane.id = i;
+    lanes.push_back(lane);
+  }
+  
+  /////////////////////Find the vehicles on the road//////////////////////////
+  find_vehicles_on_road(lanes, vehicles);
+  ////////////////////////////////////////////////
+  
   
   //Aa kk if we have left overs put Ego at the end of the left overs
   if(prev_size > 0)
@@ -166,7 +177,7 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   //kk if vehicle is too close and the left is clear set Maneuver to Lane Change Left
   if(too_close && clear_left) Maneuver = LCL;
   //kk if vehicle is too close and the right is clear set Maneuver to Lane Change Right
-  if(too_close && clear_right) Maneuver = LCR;
+  else if(too_close && clear_right) Maneuver = LCR;
   /**************************************************************/
   
   //DEBUG
@@ -246,30 +257,52 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
 /********************************************************************************************/
 //KK find the closest vehicles
 /********************************************************************************************/
-void EgoVehicle::find_closest_vehicles(vector<OtherVehicle> vehicles)
+void EgoVehicle::find_vehicles_on_road(vector<Lane> &lanes, vector<OtherVehicle> vehicles)
 {
   
   //DEBUG
-  cout<<"Finding closest cars...."<<endl;
+  cout<<"Finding cars on the road and assigning to lanes they are in...."<<endl;
   
-  const int search_range = 22*2; //KK search with 22m/sec*2sec meters
-  vector<OtherVehicle> closest_vehicles;
   for(auto vehicle : vehicles){
-    
-    double dist_s = fabs(vehicle.s-this->s); //KK distance in s from ego of other car
     double d = vehicle.d;
+    int lane_id = d/roadMap.lane_width; //kk lane number
+    vehicle.dist_from_ego  = fabs(vehicle.s-this->s); //KK distance in s from ego of other car
     
-    //KK find cars within search_range
-    int num_lanes = roadMap.num_lanes;
-    double lane_width = roadMap.lane_width;
-    if(dist_s < search_range && d > 0 && d <= num_lanes*lane_width){
-      closest_vehicles.push_back(vehicle);
-      
-      //DEBUG
-      printf ("closest vehicle (id, s, d): (%f, %f, %f) \n\n", vehicle.id, vehicle.s, vehicle.d);
+    lanes[lane_id].all_vehicles.push_back(vehicle);
+    lanes[lane_id].empty = false;
+  }
+  
+  for(Lane lane : lanes){
+    double prev_dist_from_ego = 999.9;
+    for(OtherVehicle vehicle : lane.all_vehicles){
+      if(vehicle.dist_from_ego < prev_dist_from_ego){
+        lane.closest_vehicle = {vehicle};
+        prev_dist_from_ego = vehicle.dist_from_ego;
+        
+        printf("lane(%d).closest_vehicle.dist_from_ego = %f\n", lane.id, vehicle.dist_from_ego);
+      }
     }
   }
-  this->closest_vehicles = closest_vehicles;
+  
+  
+//  const int search_range = 22*2; //KK search with 22m/sec*2sec meters
+//  vector<OtherVehicle> closest_vehicles;
+//  for(auto vehicle : vehicles){
+//
+//    double dist_s = fabs(vehicle.s-this->s); //KK distance in s from ego of other car
+//    double d = vehicle.d;
+//
+//    //KK find cars within search_range
+//    int num_lanes = roadMap.num_lanes;
+//    double lane_width = roadMap.lane_width;
+//    if(dist_s < search_range && d > 0 && d <= num_lanes*lane_width){
+//      closest_vehicles.push_back(vehicle);
+//
+//      //DEBUG
+//      printf ("closest vehicle (id, s, d): (%f, %f, %f) \n\n", vehicle.id, vehicle.s, vehicle.d);
+//    }
+//  }
+//  this->closest_vehicles = closest_vehicles;
 }
 /********************************************************************************************/
 

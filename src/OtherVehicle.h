@@ -23,9 +23,13 @@ using namespace tools;
 //kk Houses the data of a vehicle other than Ego.
 class OtherVehicle{
 public:
-  //Constructor
   
+  //Default Constructor
+  OtherVehicle();
+  
+  //Constructor
   OtherVehicle(int id, double x, double y, double vx, double vy, double s, double d);
+  
   //Destructor
   virtual ~OtherVehicle();
   
@@ -39,6 +43,7 @@ public:
   double yaw;
   double speed;
   int lane;
+  double dist_from_ego = 999.9;
   Trajectory predicted_trajectory;
 
   //KK Generate a spline trajectory for given variables
