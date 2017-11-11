@@ -63,12 +63,10 @@ int main() {
   double lane_width = 4; //  meters
   double speed_limit = 50; // mph
   
-  // Road map of waypoints
+  //kk Road map of waypoints
   RoadMap roadMap{map_waypoints_x, map_waypoints_y, map_waypoints_s,
     map_waypoints_dx, map_waypoints_dy, num_lanes, lane_width, speed_limit};
 
-  int lane = 1; //Aaron start in lane 1
-  double ref_vel = 0; //Aaron set reference velocity in mph
   
   //KK Declare Ego vehicle
   EgoVehicle Ego(roadMap);
@@ -107,34 +105,52 @@ int main() {
           double end_path_s = j[1]["end_path_s"];
           double end_path_d = j[1]["end_path_d"];
           
+          int prev_size = previous_path_x.size();
           
+          //kk package car data from sim
           vector<double> car_data = {car_x, car_y, car_s, car_d, car_yaw, car_speed,
             end_path_s, end_path_d};
           
+          //kk package previous path data from sim
           vector< vector<double> > previous_path = {previous_path_x, previous_path_y};
           
           // Sensor Fusion Data, a list of all other cars on the same side of the road.
           auto sensor_fusion = j[1]["sensor_fusion"];
           
+          /*******************************************************************************/
+          //kk populate cars on the road from sensor_fusion
+          /*******************************************************************************/
           vector<OtherVehicle> vehicles_on_road;
           for(int i=0; i<sensor_fusion.size(); i++){
-            double id = sensor_fusion[i][0];
-            double x = sensor_fusion[i][1];
-            double y = sensor_fusion[i][2];
-            double vx = sensor_fusion[i][3];
-            double vy = sensor_fusion[i][4];
-            double s = sensor_fusion[i][5];
-            float d = sensor_fusion[i][6];
-            OtherVehicle car(id, x, y, vx, vy, s, d);
+            OtherVehicle car;
+            
+            car.id = sensor_fusion[i][0];
+            car.x = sensor_fusion[i][1];
+            car.y = sensor_fusion[i][2];
+            car.vx = sensor_fusion[i][3];
+            car.vy = sensor_fusion[i][4];
+            //car.s = double(sensor_fusion[i][5]);
+            car.d = sensor_fusion[i][6];
+            car.speed = sqrt(car.vx*car.vx + car.vy*car.vy);
+            car.s = double(sensor_fusion[i][5]) + double(prev_size * 0.02 * car.speed); // predicted at end of path
+            car.lane = get_lane(car.d, Ego.roadMap.lane_width, Ego.roadMap.num_lanes);
+            
             vehicles_on_road.push_back(car);
           }
+          /*******************************************************************************/
+          /*******************************************************************************/
+          
         
           //kk declare next x, y values to pass to sim
           vector<double> next_x_vals;
           vector<double> next_y_vals;
           
+          /*******************************************************************************/
           //kk jump in to Ego and start the process of making a decision
+          /*******************************************************************************/
           Ego.update(car_data, previous_path, vehicles_on_road, next_x_vals, next_y_vals);
+          /*******************************************************************************/
+          /*******************************************************************************/
           
          
           json msgJson;

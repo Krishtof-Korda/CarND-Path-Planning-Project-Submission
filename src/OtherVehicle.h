@@ -24,11 +24,8 @@ using namespace tools;
 class OtherVehicle{
 public:
   
-  //Default Constructor
-  OtherVehicle();
-  
   //Constructor
-  OtherVehicle(int id, double x, double y, double vx, double vy, double s, double d);
+  OtherVehicle();
   
   //Destructor
   virtual ~OtherVehicle();
@@ -43,9 +40,13 @@ public:
   double yaw;
   double speed;
   int lane;
-  double dist_from_ego = 999.9;
+  double dist_from_ego = DBL_MAX;
+  
   Trajectory predicted_trajectory;
 
+  //kk return -1 for empty vehicle
+  bool isEmpty();
+  
   //KK Generate a spline trajectory for given variables
   Trajectory generate_predicted_trajectory(RoadMap roadMap);
 

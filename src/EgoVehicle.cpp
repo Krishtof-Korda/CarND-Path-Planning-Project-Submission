@@ -7,18 +7,15 @@
 
 #include "EgoVehicle.h"
 #include "OtherVehicle.h"
-#include "Lane.h"
-
 
 
 EgoVehicle::EgoVehicle(RoadMap roadMap){
   
-  this->lane = 1;
   this->ref_vel = 49.5;
   this->vel = 0;
   this->roadMap = roadMap;
   this->max_accel = .4; //KK max accel or decel
-  
+  this->num_points = 20; //kk number of point to plan ahead
   
 }
 
@@ -28,6 +25,7 @@ EgoVehicle::~EgoVehicle(){
 /********************************************************************************************/
 //kk Update Ego given car data, previous path, the other vehicles on the road.
 /********************************************************************************************/
+//template <typename T>
 void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previous_path, vector<OtherVehicle> vehicles, vector<double> &next_x_vals, vector<double> &next_y_vals)
 {
   //DEBUG
@@ -37,6 +35,7 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   this->y = car_data[1];
   this->s = car_data[2];
   this->d = car_data[3];
+  this->lane = get_lane(this->d, roadMap.lane_width, roadMap.num_lanes);
   this->yaw = car_data[4];
   this->speed = car_data[5];
   this->end_path_s = car_data[6];
@@ -48,181 +47,129 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   
   printf("PREV_SIZE: %d\n", prev_size); //DEBUG
   
-  /////////////////////Declare a vector of Lane structs and initialize////////////////////////
-  vector<Lane> lanes;
-  for(int i=0; i<roadMap.num_lanes; i++){
-    Lane lane;
-    lane.id = i;
-    lanes.push_back(lane);
-  }
-  
-  /////////////////////Find the vehicles on the road//////////////////////////
-  find_vehicles_on_road(lanes, vehicles);
-  ////////////////////////////////////////////////
-  
-  
   //Aa kk if we have left overs put Ego at the end of the left overs
   if(prev_size > 0)
   {
     this->s = this->end_path_s;
     this->d = this->end_path_d;
+    //this->lane = get_lane(this->d, roadMap.lane_width, roadMap.num_lanes);
   }
   
-  //kk Initialize my booleans for
-  this->clear_left = false;
-  this->clear_right = false;
-  this->too_close = false;
   
-  //KK speed of car in front for use later
-  double tandem_car_speed = 0;
-  //KK distance of car in front for use later
-  double tandem_car_distance = 100;
+  /////////////////////Find the vehicles in front, left, right//////////////////////////
+  bool only_in_front = true;
+  // Find the closest vehicle in FRONT AND MOVE IT where it will be at the end of Ego End Point
+  OtherVehicle Vehicle_Front = find_closest_vehicle(this->lane, vehicles, only_in_front);
+  printf("closest vehicle in front (s, v): (%f, %f) \n\n", Vehicle_Front.s, Vehicle_Front.speed);
+  
+  // Find the closest vehicle in LEFT AND MOVE IT where it will be at the end of Ego End Point
+  OtherVehicle Vehicle_Left  = find_closest_vehicle(this->lane-1, vehicles, not only_in_front);
+  printf("closest vehicle in Left (s, v): (%f, %f) \n\n", Vehicle_Left.s, Vehicle_Left.speed);
+  
+  // Find the closest vehicle in RIGHT AND MOVE IT where it will be at the end of Ego End Point
+  OtherVehicle Vehicle_Right = find_closest_vehicle(this->lane+1, vehicles, not only_in_front);
+  printf("closest vehicle in Right (s, v): (%f, %f) \n\n", Vehicle_Right.s, Vehicle_Right.speed);
+  
+  ////////////////////////////////////////////////
   
   //DEBUG
-  printf("closest_vechicles.size: %lu\n", closest_vehicles.size());
-  
-  double lane_width = roadMap.lane_width;
-  double half_lane = lane_width/2;
-  double num_lanes = roadMap.num_lanes;
-  double ego_lane_center = lane_width*lane + half_lane;
-  double adjacent_lane = lane_width + half_lane;
+  printf("closest vechicles (left, front, right): (%f, %f, %f)\n", Vehicle_Left.s - this->s, Vehicle_Front.s - this->s, Vehicle_Right.s - this->s);
   
   
-  if(closest_vehicles.empty())
-  {
-    this->clear_left = true; //printf("clear left = %d\n\n", clear_left);
-    this->clear_right = true; //printf("clear right = %d\n\n", clear_right);
-  }
+  //kk reaction gap between car in front based on current speed.
+  double react_time = 1; // reaction time in seconds
+  this->react_gap = react_time * mph2ms(this->vel);
   
-  for(int i=0; i<closest_vehicles.size(); i++)
-  {
-    
-    double vx = closest_vehicles[i].vx;
-    double vy = closest_vehicles[i].vy;
-    double check_speed = sqrt(vx*vx + vy*vy);
-    double check_car_s = closest_vehicles[i].s;
-    double d = closest_vehicles[i].d;
-    
-    //DEBUG
-    printf("closest_vehicles[%d].d: %f\n", i, d);
-    
-    ///////////////////Check if we have car in our lane//////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////
-    if(d<(2+4*this->lane+2) && d>(2+4*this->lane-2)) //kk car in our lane
-    {
-      
-      //DEBUG
-      printf("CAR IN MY LANE!!!!........\n");
-      
-      //Aa Predict where the car will be at the end of previous path received from sim
-      check_car_s += (double)this->prev_size*.02*check_speed;
-      
-      //kk reaction gap between car in front based on current speed.
-      double react_time = 0.5; // reaction time in seconds
-      this->react_gap = react_time * this->vel;
-      
-      //DEBUG
-      printf("CHECK_CAR_S - S, REACT_GAP: (%f, %f)\n", check_car_s-this->s, react_gap);
-      printf("CHECK_CAR_S, S: (%f, %f)\n", check_car_s, this->s);
-      
-      //Aa check s value greater than mine and s gap
-      if(check_car_s > this->s && check_car_s - this->s < react_gap) //kk car too close
-      {
-        
-        //DEBUG
-        printf("CAR TOO CLOSE!!!!........\n");
-        
-        //Aa do some logic here, lower ref vel so we don't crash into the car in front of us
-        // could also flag to try to change lanes.
-        too_close = true;
-        tandem_car_speed = check_speed;
-        tandem_car_distance = fabs(check_car_s - this->s);
-      }
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////
-    
-    
-    ///////////////////Check if we are clear in specific directions//////////////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////
-    
-    //TODO: logic not working
-    if(d<ego_lane_center && d>(ego_lane_center - adjacent_lane) && d<0 && d<num_lanes*lane_width) //KK car on my left
-    { //kk car is anywhere between half a car length behind me to the reaction gap
-      //kk sets clear_left = false if there is a car next to me within the range
-      clear_left = not(check_car_s > this->s-car_length/2 && fabs(check_car_s - this->s) < react_gap+car_length/2+car_buffer);
-      printf("clear left = %d\n\n", clear_left);
-    }
-    else clear_left = true;
-    //printf("clear left = %d\n\n", clear_left);
-    
-    if(d>ego_lane_center && d<(ego_lane_center + adjacent_lane) && d<0 && d<num_lanes*lane_width) //KK car on my right
-    { //kk car is anywhere between half a car length behind me to the reaction gap
-      //kk sets clear_right = false if there is a car next to me within the range
-      clear_right = not(check_car_s > this->s-car_length/2 && fabs(check_car_s - this->s) < react_gap+car_length/2+car_buffer);
-      printf("clear right = %d\n\n", clear_right);
-    }
-    else clear_right=true;
-    //printf("clear right = %d\n\n", clear_right);
-    
-    ///////////////////////////////////////////////////////////////
-  }
-  
-  /**************************************************************/
-  // Decide which maneuver to do
-  /**************************************************************/
-  //kk if vehicle is not too close set Maneuver to Cruise Control
-  if(not(too_close)) Maneuver = CC;
-  //kk if vehicle is too close set Maneuver to Keep Lane
-  if(too_close) Maneuver = KL;
-  //kk if vehicle is too close and the left is clear set Maneuver to Lane Change Left
-  if(too_close && clear_left) Maneuver = LCL;
-  //kk if vehicle is too close and the right is clear set Maneuver to Lane Change Right
-  else if(too_close && clear_right) Maneuver = LCR;
-  /**************************************************************/
-  
-  //DEBUG
-  printf("Vel, tandem speed: (%f, %f)\n", vel, tandem_car_speed);
+  printf("vel: %f\n\n", this->vel);
   
   //kk Adaptive cruise control proportional gains
-  double k_decel = 2/tandem_car_distance; //KK slow down gain
-  double k_accel = 100*tandem_car_distance; //KK speed up gain
+  double k_decel = 2 / fabs(Vehicle_Front.s - this->s); //KK slow down gain
+  double k_accel = 100 * fabs(Vehicle_Front.s - this->s); //KK speed up gain
+ 
+  
+  /*****************************************************************************************/
+  // Decide which maneuver to choose
+  /*****************************************************************************************/
+  
+  // Check if lane is open in front or car is far enough away, Choose cruise control at max reference velocity
+  if ( Vehicle_Front.isEmpty() || (Vehicle_Front.s - this->s > react_gap) )
+    Maneuver = CC;
+
+  else // We have a car in front. We need to decide whether to stay and follow, change left or change right.
+  {
+    //DEBUG
+    printf("CAR IN MY LANE TOO CLOSE!!!!........\n");
+  
+    Maneuver = ACC; // Default to ACC unless overwritten later
+    
+    
+    /////kk Determine the buffers for an allowable lane change
+    double left_closing_speed = ( Vehicle_Left.speed - mph2ms(this->vel) );
+    double left_speed_buffer= max(left_closing_speed, 0.0) * react_time;
+    
+    double right_closing_speed = ( Vehicle_Right.speed - mph2ms(this->vel) );
+    double right_speed_buffer= max(right_closing_speed, 0.0) * react_time;
+    
+    double left_rear_buffer = left_speed_buffer + car_length/2 + car_buffer;
+    double right_rear_buffer = right_speed_buffer + car_length/2 + car_buffer;
+    
+    bool left_clear = ( Vehicle_Left.s < (this->s - left_rear_buffer) ) ||
+                      ( Vehicle_Left.s > (this->s + react_gap) );
+    
+    bool right_clear = ( Vehicle_Right.s < (this->s - right_rear_buffer) ) ||
+                        ( Vehicle_Right.s > (this->s + react_gap) );
+    
+    
+    //kk check if there is a left lane and if it is clear
+    if ( (this->lane > 0)  &&  (Vehicle_Left.isEmpty() || left_clear) )
+      Maneuver = LCL; // We don't have a car on the left TOO close and we can change lane LEFT
+ 
+    //kk check if there is a right lane and if it is clear
+    else if ( (this->lane < this->roadMap.num_lanes-1) && (Vehicle_Right.isEmpty() || right_clear) )
+      Maneuver = LCR;
+  }
+  /*****************************************************************************************/
+  /*****************************************************************************************/
+  
+  
   
   /**************Switch Case to Make Decision********************/
   switch (Maneuver) {
-    case LCL:
-      printf("MANEUVER EXECUTED LCL.........\n\n");
-      lane = max(lane-1, 0);
-      break;
     
-    case LCR:
-      printf("MANEUVER EXECUTED LCR.........\n\n");
-      lane = min(lane+1, 2);
-      break;
-      
-    case KL: //Keep Lane and engage adaptive cruise control
-      //lane = lane+0;
-      printf("MANEUVER EXECUTED KL.........\n\n");
-      
-      /**************Adaptive Cruise Conntrol********************/
-      if(this->vel > tandem_car_speed) this->vel -= min(k_decel, max_accel);
-      else this->vel += min(k_accel, max_accel);
-      /***********************************************************/
-      
-      break;
-      
     case CC: // Cruise control with no car in front
       printf("MANEUVER EXECUTED CC.........\n\n");
       /******************************** Cruise Control***********/
       if(this->vel < this->ref_vel) this->vel += max_accel;
       if(this->vel > this->ref_vel) this->vel -= max_accel;
       /********************************************************/
+      break;
+    
+    case LCL:
+      printf("MANEUVER EXECUTED LCL.........\n\n");
+      lane = max(lane-1, 0);
+      break;
       
+    case LCR:
+      printf("MANEUVER EXECUTED LCR.........\n\n");
+      lane = min(lane+1, 2);
+      break;
+      
+    case ACC: //Keep Lane and engage adaptive cruise control
+      //lane = lane+0;
+      printf("MANEUVER EXECUTED ACC.........\n\n");
+      
+      /**************Adaptive Cruise Conntrol********************/
+      if(this->vel > Vehicle_Front.speed) this->vel -= min(k_decel, max_accel);
+      else this->vel += min(k_accel, max_accel);
+      /***********************************************************/
       break;
       
     default:
       break;
   }
-  /***********************************************************/
+      /***********************************************************/
+  
+  
   
   
   
@@ -233,7 +180,7 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   /***********************************************************/
   
   //DEBUG
-  printf ("Assigning next x, y vals...\n");
+  //printf ("Assigning next x, y vals...\n");
   
   /***********************************************************/
   //kk assign generated trajectory to next_x_vals, next_y_vals
@@ -243,7 +190,7 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
   /***********************************************************/
   
   //DEBUG
-  printf ("calctrajx size: %lu\n",calculated_trajectory.x_vals.size());
+  //printf ("calctrajx size: %lu\n",calculated_trajectory.x_vals.size());
 //  printf ("nextx size: %lu\n",next_x_vals.size());
   
 //  //DEBUG
@@ -257,52 +204,45 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
 /********************************************************************************************/
 //KK find the closest vehicles
 /********************************************************************************************/
-void EgoVehicle::find_vehicles_on_road(vector<Lane> &lanes, vector<OtherVehicle> vehicles)
+OtherVehicle EgoVehicle::find_closest_vehicle(int lane, vector<OtherVehicle> vehicles, bool only_in_front)
 {
   
+  OtherVehicle closest_vehicle;
+  
   //DEBUG
-  cout<<"Finding cars on the road and assigning to lanes they are in...."<<endl;
+  cout<<"Finding closest vehicle to Ego...."<<endl;
+  // First Check if legitimate lane
+  if (lane < 0 || lane > this->roadMap.num_lanes - 1)
+    return closest_vehicle;
   
-  for(auto vehicle : vehicles){
-    double d = vehicle.d;
-    int lane_id = d/roadMap.lane_width; //kk lane number
-    vehicle.dist_from_ego  = fabs(vehicle.s-this->s); //KK distance in s from ego of other car
-    
-    lanes[lane_id].all_vehicles.push_back(vehicle);
-    lanes[lane_id].empty = false;
-  }
-  
-  for(Lane lane : lanes){
-    double prev_dist_from_ego = 999.9;
-    for(OtherVehicle vehicle : lane.all_vehicles){
-      if(vehicle.dist_from_ego < prev_dist_from_ego){
-        lane.closest_vehicle = {vehicle};
-        prev_dist_from_ego = vehicle.dist_from_ego;
-        
-        printf("lane(%d).closest_vehicle.dist_from_ego = %f\n", lane.id, vehicle.dist_from_ego);
+  double min_distance = DBL_MAX;
+  bool consider_this_vehicle;
+  for (auto vehicle : vehicles) {
+    if (lane == vehicle.lane) //KK if in Ego's lane
+    {
+      double dist_s = vehicle.s - this->s; //KK distance (IN FRONT OR BEHIND) in s from ego of other car
+      //cout << "distance to car in Ego's lane: " << dist_s << endl;
+      
+      if (only_in_front && dist_s < 0)
+      {
+        consider_this_vehicle = false;
+      }
+      else
+      {
+        dist_s = fabs(dist_s);
+        consider_this_vehicle = true;
+      }
+      // This will find the "closest" whether is behind Ego or in front of Ego.
+      if (consider_this_vehicle && dist_s < min_distance)
+      {
+        min_distance = dist_s;
+        closest_vehicle = vehicle;
+        //cout << " closest Vehicle so far: " << min_distance << endl;
       }
     }
   }
-  
-  
-//  const int search_range = 22*2; //KK search with 22m/sec*2sec meters
-//  vector<OtherVehicle> closest_vehicles;
-//  for(auto vehicle : vehicles){
-//
-//    double dist_s = fabs(vehicle.s-this->s); //KK distance in s from ego of other car
-//    double d = vehicle.d;
-//
-//    //KK find cars within search_range
-//    int num_lanes = roadMap.num_lanes;
-//    double lane_width = roadMap.lane_width;
-//    if(dist_s < search_range && d > 0 && d <= num_lanes*lane_width){
-//      closest_vehicles.push_back(vehicle);
-//
-//      //DEBUG
-//      printf ("closest vehicle (id, s, d): (%f, %f, %f) \n\n", vehicle.id, vehicle.s, vehicle.d);
-//    }
-//  }
-//  this->closest_vehicles = closest_vehicles;
+  //cout << " closest Vehicle: " << closest_vehicle.id << endl;
+  return closest_vehicle;
 }
 /********************************************************************************************/
 
@@ -410,7 +350,7 @@ Trajectory EgoVehicle::generate_trajectory()
   double x_add_on = 0;
   
   //Aa Fill up the rest of our path planner after filling it with previous points, here we will always output 50 points
-  for(int i=1; i<=50-prev_size; i++)
+  for(int i=1; i<=num_points-prev_size; i++)
   {
     double N = target_dist/(.02*mph2ms(vel)); //KK converted ref_vel to m/s.
     double x_point = x_add_on + target_x/N;

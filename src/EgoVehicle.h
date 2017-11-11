@@ -13,7 +13,7 @@
 #include "tools.h"
 #include "structs.h"
 #include "OtherVehicle.h"
-#include "Lane.h"
+#include <algorithm> 
 //#include "cost_functions.h"
 
 using namespace std;
@@ -40,26 +40,26 @@ public:
   double max_accel; //KK max accel or decel
   double car_width = 1.5; //kk car width in meters
   double car_length = 2.5; //kk car length in meters
-  double car_buffer = 0.1; //kk buffer from other cars
+  double car_buffer = 2; //kk buffer from other cars
   double end_path_s;
   double end_path_d;
   double react_gap;
-  bool clear_left;
-  bool clear_right;
   bool too_close;
   vector<double> previous_path_x;
   vector<double> previous_path_y;
   int prev_size;
+  int num_points;
   vector< OtherVehicle > closest_vehicles;
   Trajectory calculated_trajectory;
   RoadMap roadMap;
   States Maneuver = CC;
 
   //kk Update the state of Ego given the other vehicles on the road
+  //template <typename T>
   void update(vector<double> car_data, vector< vector<double> > previous_path, vector<OtherVehicle> vehicles, vector<double> &next_x_vals, vector<double> &next_y_vals);
   
   //KK find the closest vehicles
-  void find_vehicles_on_road(vector<Lane> &lanes, vector<OtherVehicle> vehicles);
+  OtherVehicle find_closest_vehicle(int lane, vector<OtherVehicle> vehicles, bool only_in_front);
   
   //KK Generate a spline trajectory for given variables
   Trajectory generate_trajectory();

@@ -22,6 +22,8 @@
 #include "json.hpp"
 #include <vector>
 
+#define DBL_MAX          1.7976931348623158e+308 // max value
+
 
 using namespace std;
 
@@ -52,6 +54,9 @@ namespace tools
 
   // Transform from Frenet s,d coordinates to Cartesian x,y
   vector<double> getXY(double s, double d, const vector<double> &maps_s, const vector<double> &maps_x, const vector<double> &maps_y);
+  
+  //KK Helper to get the lane number (lane 0 is most far left
+  int get_lane(double d, double lane_with, int num_lanes);
 
   
 }
