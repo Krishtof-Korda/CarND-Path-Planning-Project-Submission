@@ -7,21 +7,21 @@
 
 #include "OtherVehicle.h"
 
-OtherVehicle::OtherVehicle(){}
-
-OtherVehicle::OtherVehicle(int id, double x, double y, double vx, double vy, double s, double d){
+OtherVehicle::OtherVehicle(){
   
-  this->id = id;
-  this-> x = x;
-  this-> y = y;
-  this-> vx = vx;
-  this-> vy = vy;
-  this-> s = s;
-  this-> d = d;
+  this->id = -1;
   
-  this->yaw = atan2(vy,vx);
-  this->speed = sqrt(vx*vx + vy*vy);
-  this->lane = -1;
+//  this->id = id;
+//  this-> x = x;
+//  this-> y = y;
+//  this-> vx = vx;
+//  this-> vy = vy;
+//  this-> s = s;
+//  this-> d = d;
+//
+//  this->yaw = atan2(vy,vx);
+//  this->speed = sqrt(vx*vx + vy*vy);
+//  this->lane = -1;
   
   
   
@@ -29,6 +29,11 @@ OtherVehicle::OtherVehicle(int id, double x, double y, double vx, double vy, dou
 
 OtherVehicle::~OtherVehicle(){
   
+}
+
+bool OtherVehicle::isEmpty() // return a logical for whether vehicle is empty
+{
+  return (this->id == -1);
 }
 
 /*********************************************************************************************

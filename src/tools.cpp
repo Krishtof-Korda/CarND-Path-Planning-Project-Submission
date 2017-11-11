@@ -158,5 +158,20 @@ namespace tools {
     
   }
   
+  /********************************************************************************************/
+  //KK Get lane number from d Frenet Coordinate
+  /********************************************************************************************/
+  int get_lane(double d, double lane_width, int num_lanes)
+  {
+    int lane = int(d / lane_width);
+    
+    if (lane < 0)
+      lane = 0;
+    else if (lane > num_lanes - 1)
+      lane = num_lanes - 1;
+    
+    return lane;
+  }
+  
   
 }
