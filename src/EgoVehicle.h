@@ -40,7 +40,7 @@ public:
   double max_accel; //KK max accel or decel
   double car_width = 1.5; //kk car width in meters
   double car_length = 2.5; //kk car length in meters
-  double car_buffer = 2; //kk buffer from other cars
+  double car_buffer = 3; //kk buffer from other cars
   double end_path_s;
   double end_path_d;
   double react_gap;

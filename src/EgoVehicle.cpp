@@ -120,8 +120,15 @@ void EgoVehicle::update(vector<double> car_data, vector< vector<double> > previo
                         ( Vehicle_Right.s > (this->s + react_gap) );
     
     
+    
+    // if both left and right are open add a bool left_car_further to help decide which lane to change to.
+    bool left_car_further = true;
+    if ( left_clear && right_clear )
+      if ( (Vehicle_Left.s - this->s > 0) && (Vehicle_Right.s - this->s > 0) )
+        left_car_further = (Vehicle_Left.s - this->s) > (Vehicle_Right.s - this->s);
+    
     //kk check if there is a left lane and if it is clear
-    if ( (this->lane > 0)  &&  (Vehicle_Left.isEmpty() || left_clear) )
+    if ( (this->lane > 0)  &&  (Vehicle_Left.isEmpty() || (left_clear && left_car_further) ) )
       Maneuver = LCL; // We don't have a car on the left TOO close and we can change lane LEFT
  
     //kk check if there is a right lane and if it is clear
