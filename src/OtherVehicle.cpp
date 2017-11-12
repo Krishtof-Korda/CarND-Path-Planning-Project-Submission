@@ -1,4 +1,4 @@
-//
+//  Self-driving Car Engineer Nanodegree - Udacity
 //  OtherVehicle.cpp
 //  path_planning
 //
@@ -9,27 +9,10 @@
 
 OtherVehicle::OtherVehicle(){
   
-  this->id = -1;
-  
-//  this->id = id;
-//  this-> x = x;
-//  this-> y = y;
-//  this-> vx = vx;
-//  this-> vy = vy;
-//  this-> s = s;
-//  this-> d = d;
-//
-//  this->yaw = atan2(vy,vx);
-//  this->speed = sqrt(vx*vx + vy*vy);
-//  this->lane = -1;
-  
-  
-  
+  this->id = -1; //KK initialize vehicle as empty
 }
 
-OtherVehicle::~OtherVehicle(){
-  
-}
+OtherVehicle::~OtherVehicle(){}
 
 bool OtherVehicle::isEmpty() // return a logical for whether vehicle is empty
 {
@@ -37,7 +20,8 @@ bool OtherVehicle::isEmpty() // return a logical for whether vehicle is empty
 }
 
 /*********************************************************************************************
-kk generate predicted trajectory of the other vehicle
+KK generate predicted trajectory of the other vehicle for cost function comparison
+ this was not used due to time constraints of the project.
 *********************************************************************************************/
 Trajectory OtherVehicle::generate_predicted_trajectory(RoadMap roadMap)
 {

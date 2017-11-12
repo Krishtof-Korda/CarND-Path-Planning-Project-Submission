@@ -1,4 +1,4 @@
-//
+//  Self-driving Car Engineer Nanodegree - Udacity
 //  OtherVehicle.hpp
 //  path_planning
 //
@@ -18,9 +18,7 @@
 using namespace std;
 using namespace tools;
 
-
-
-//kk Houses the data of a vehicle other than Ego.
+//KK Houses the data of a vehicle other than Ego.
 class OtherVehicle{
 public:
   
@@ -42,13 +40,13 @@ public:
   int lane;
   double dist_from_ego = DBL_MAX;
   
+  //KK Place holder to predict points where vehicle will be in the future
   Trajectory predicted_trajectory;
 
-  //kk return -1 for empty vehicle
+  //KK return -1 for empty vehicle
   bool isEmpty();
   
   //KK Generate a spline trajectory for given variables
   Trajectory generate_predicted_trajectory(RoadMap roadMap);
-
 };
 #endif /* OtherVehicle_h */

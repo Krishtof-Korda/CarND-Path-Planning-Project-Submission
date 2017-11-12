@@ -1,4 +1,4 @@
-//
+//  Self-driving Car Engineer Nanodegree - Udacity
 //  EgoVehicle.hpp
 //  path_planning
 //

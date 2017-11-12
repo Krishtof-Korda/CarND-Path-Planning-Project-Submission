@@ -1,4 +1,4 @@
-//
+//  Self-driving Car Engineer Nanodegree - Udacity
 //  structs.h
 //  path_planning
 //
@@ -13,6 +13,7 @@
 
 using namespace std;
 
+//KK A structure for holding all of the road map data
 struct RoadMap{
   vector<double> waypoints_x;
   vector<double> waypoints_y;
@@ -21,27 +22,22 @@ struct RoadMap{
   vector<double> waypoints_dy;
   
   int num_lanes;
-  double lane_width; //  meters
-  double speed_limit; // mph
+  double lane_width; //KK  meters
+  double speed_limit; //KK mph
 };
 
-//struct Lane{
-//  int id;
-//  vector<OtherVehicle> all_vehicles;
-//  OtherVehicle closest_vehicle;
-//  bool empty = true;
-//};
-
+//KK A structure holding the x, y values of a trajectory
 struct Trajectory{
   vector<double> x_vals;
   vector<double> y_vals;
 };
 
+//KK Enumeration for the switch the state of Ego
 enum States {
-  CC, // cruise control with no car in front
-  ACC, // keep lane
-  LCL, // lane change left
-  LCR, // lane change right
+  CC, //KK cruise control with no car in front
+  ACC, //KK keep lane
+  LCL, //KK lane change left
+  LCR, //KK lane change right
 };
 
 #endif /* structs_h */
