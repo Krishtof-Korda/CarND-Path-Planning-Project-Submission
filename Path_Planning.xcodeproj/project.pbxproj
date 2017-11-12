@@ -35,6 +35,9 @@
 
 /* Begin PBXBuildFile section */
 		245CA326DD884E23A72495A1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAB332A32AAB4E6EACF1E717 /* main.cpp */; };
+		311D35DA1FAAC99C000B152D /* tools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311D35D81FAAC99C000B152D /* tools.cpp */; };
+		311D35DD1FAAD707000B152D /* EgoVehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 311D35DB1FAAD707000B152D /* EgoVehicle.cpp */; };
+		3139A4A21FAEBB1500D7BAB5 /* OtherVehicle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3139A4A01FAEBB1500D7BAB5 /* OtherVehicle.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +66,13 @@
 
 /* Begin PBXFileReference section */
 		2A49BFE1AE41472BB0C08DE7 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		311D35D81FAAC99C000B152D /* tools.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tools.cpp; path = src/tools.cpp; sourceTree = "<group>"; };
+		311D35D91FAAC99C000B152D /* tools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tools.h; path = src/tools.h; sourceTree = "<group>"; };
+		311D35DB1FAAD707000B152D /* EgoVehicle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = EgoVehicle.cpp; path = src/EgoVehicle.cpp; sourceTree = "<group>"; };
+		311D35DC1FAAD707000B152D /* EgoVehicle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EgoVehicle.h; path = src/EgoVehicle.h; sourceTree = "<group>"; };
+		3139A49F1FAE94C700D7BAB5 /* structs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = structs.h; path = src/structs.h; sourceTree = "<group>"; };
+		3139A4A01FAEBB1500D7BAB5 /* OtherVehicle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = OtherVehicle.cpp; path = src/OtherVehicle.cpp; sourceTree = "<group>"; };
+		3139A4A11FAEBB1500D7BAB5 /* OtherVehicle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OtherVehicle.h; path = src/OtherVehicle.h; sourceTree = "<group>"; };
 		31AD90851F9D661100C8F580 /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = src/json.hpp; sourceTree = "<group>"; };
 		31B107041FA59E5100F5CB1F /* spline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spline.h; path = src/spline/src/spline.h; sourceTree = "<group>"; };
 		5C13F60656F54DB4A3C84A72 /* CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
@@ -84,9 +94,16 @@
 		4C155674C4B647E49947CED3 /* Source Files */ = {
 			isa = PBXGroup;
 			children = (
+				311D35D81FAAC99C000B152D /* tools.cpp */,
+				311D35D91FAAC99C000B152D /* tools.h */,
 				31B107041FA59E5100F5CB1F /* spline.h */,
 				31AD90851F9D661100C8F580 /* json.hpp */,
 				FAB332A32AAB4E6EACF1E717 /* main.cpp */,
+				311D35DB1FAAD707000B152D /* EgoVehicle.cpp */,
+				311D35DC1FAAD707000B152D /* EgoVehicle.h */,
+				3139A49F1FAE94C700D7BAB5 /* structs.h */,
+				3139A4A01FAEBB1500D7BAB5 /* OtherVehicle.cpp */,
+				3139A4A11FAEBB1500D7BAB5 /* OtherVehicle.h */,
 			);
 			name = "Source Files";
 			sourceTree = "<group>";
@@ -224,6 +241,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				245CA326DD884E23A72495A1 /* main.cpp in Sources */,
+				311D35DA1FAAC99C000B152D /* tools.cpp in Sources */,
+				311D35DD1FAAD707000B152D /* EgoVehicle.cpp in Sources */,
+				3139A4A21FAEBB1500D7BAB5 /* OtherVehicle.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

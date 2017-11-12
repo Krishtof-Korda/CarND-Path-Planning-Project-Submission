@@ -1,5 +1,8 @@
 dependencies: \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/main.cpp \
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/Lane.cpp \
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/Lane.h \
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/OtherVehicle.h \
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/tools.h \
   /usr/local/include/uWS/uWS.h /usr/local/include/uWS/Hub.h \
   /usr/local/include/uWS/Group.h /usr/local/include/uWS/WebSocket.h \
   /usr/local/include/uWS/WebSocketProtocol.h \
@@ -175,9 +178,6 @@ dependencies: \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/Eigen-3.3/Eigen/src/QR/FullPivHouseholderQR.h \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/Eigen-3.3/Eigen/src/QR/ColPivHouseholderQR.h \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/Eigen-3.3/Eigen/src/QR/CompleteOrthogonalDecomposition.h \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/json.hpp \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/tools.h \
   /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/spline/src/spline.h \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/EgoVehicle.h \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/structs.h \
-  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/OtherVehicle.h
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/json.hpp \
+  /Users/KrazyK/Documents/Udacity/CarND-Path-Planning/CarND-Path-Planning-Project-Submission/src/structs.h
