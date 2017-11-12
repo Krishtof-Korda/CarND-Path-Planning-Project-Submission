@@ -4,6 +4,8 @@
 
 [![alt text](https://img.youtube.com/vi/C-2Ck8RVmH8/0.jpg)](https://youtu.be/C-2Ck8RVmH8)
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/C-2Ck8RVmH8" frameborder="0" gesture="media" allowfullscreen></iframe>
+
 
 ### This is my submission for the CarND-Path-Planning-Project described below.
 
@@ -14,7 +16,7 @@
 ### The concepts we learned in this course revolved around a finite state machine (FSM). The FSM is the list of possible states the vehicle can be in and which states are reachable from any current state. The image below best illustrates this concept.
 
 
-![alt text](./images/FMS.png)
+![alt text](./images/FSM.png)
 
 
 ### The planner basically decides which state the car should be in given a certain set of data. This data includes:
