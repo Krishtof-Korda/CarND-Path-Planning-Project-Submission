@@ -4,7 +4,7 @@
 
 [![alt text](https://img.youtube.com/vi/C-2Ck8RVmH8/0.jpg)](https://youtu.be/C-2Ck8RVmH8)
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/C-2Ck8RVmH8" frameborder="0" gesture="media" allowfullscreen></iframe>
+
 
 
 ### This is my submission for the CarND-Path-Planning-Project described below.
@@ -55,8 +55,8 @@
 
 
 ## Outline of My Project:
-* 1. Ingest and organize the map, sensor fusion (other cars on the road), and Ego car positioning data received from the simulator
-* * Road Map waypoints and data:
+1. Ingest and organize the map, sensor fusion (other cars on the road), and Ego car positioning data received from the simulator
+   - Road Map waypoints and data:
 ```
 // Road parameters
 int num_lanes = 3;
@@ -67,7 +67,7 @@ double speed_limit = 50; // mph
 RoadMap roadMap{map_waypoints_x, map_waypoints_y, map_waypoints_s,
 map_waypoints_dx, map_waypoints_dy, num_lanes, lane_width, speed_limit};
 ```
-* * Sensor Fusion data of other cars on the road:
+   - Sensor Fusion data of other cars on the road:
 ```
 vector<OtherVehicle> vehicles_on_road;
 for(int i=0; i<sensor_fusion.size(); i++)
@@ -89,7 +89,7 @@ for(int i=0; i<sensor_fusion.size(); i++)
 }
 
 ```
-* * Ego vehicle's localization data:
+   - Ego vehicle's localization data:
 ```
 double car_x = j[1]["x"];
 double car_y = j[1]["y"];
@@ -110,7 +110,7 @@ vector<double> car_data = {car_x, car_y, car_s, car_d, car_yaw, car_speed,
 end_path_s, end_path_d};
 ```
 
-* 2. Filter the cars on the road to the ones that are most relevant for path planning, e.g. the closest vehicle in the Ego's lane and adjacent lanes.
+2. Filter the cars on the road to the ones that are most relevant for path planning, e.g. the closest vehicle in the Ego's lane and adjacent lanes.
 
 ```
 bool only_in_front = true;
@@ -128,7 +128,7 @@ printf("Distance to closest vechicles (left, front, right): (%g, %g, %g)\n", Veh
 Vehicle_Front.dist_from_ego, Vehicle_Right.dist_from_ego);
 
 ```
-* 3. Decision Making Logic Pseudocode:
+3. Decision Making Logic Pseudocode:
 ```
 if (no car in Ego lane or car is far enough away):
   Maneuver = Cruise Control
@@ -143,7 +143,7 @@ else:
   else if (right lane is empty or cars are outside a certain buffer):
     Maneuver = Lane Change Right
 ```
-* 4. Execute Maneuver:
+4. Execute Maneuver:
 ```
 /**************Switch Case to Execute Maneuver********************/
 switch (Maneuver) {
@@ -185,7 +185,7 @@ default:
 }
 
 ```
-* 5. Generate Planned Trajectory:
+5. Generate Planned Trajectory:
 ```
 Pseudocode
 
@@ -195,7 +195,7 @@ ref_pos = Ego's furthest position in previous trajectory or current position
 
 spline = spline connecting the points 'pts'
 ```
-* 6. Return the Planned Trajectory to the Simulator:
+6. Return the Planned Trajectory to the Simulator:
 ```
 next_x_vals = calculated_trajectory.x_vals;
 next_y_vals = calculated_trajectory.y_vals;
