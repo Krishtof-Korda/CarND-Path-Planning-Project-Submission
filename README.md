@@ -56,7 +56,7 @@ Usually I am very grateful at the end of a project for how well the lessons were
 
 ## Outline of My Project:
 1. Ingest and organize the map, sensor fusion (other cars on the road), and Ego car positioning data received from the simulator
-   - Road Map waypoints and data:
+* Road Map waypoints and data:
 ```
 // Road parameters
 int num_lanes = 3;
@@ -67,7 +67,7 @@ double speed_limit = 50; // mph
 RoadMap roadMap{map_waypoints_x, map_waypoints_y, map_waypoints_s,
 map_waypoints_dx, map_waypoints_dy, num_lanes, lane_width, speed_limit};
 ```
-   - Sensor Fusion data of other cars on the road:
+* Sensor Fusion data of other cars on the road:
 ```
 vector<OtherVehicle> vehicles_on_road;
 for(int i=0; i<sensor_fusion.size(); i++)
@@ -89,7 +89,7 @@ for(int i=0; i<sensor_fusion.size(); i++)
 }
 
 ```
-   - Ego vehicle's localization data:
+* Ego vehicle's localization data:
 ```
 double car_x = j[1]["x"];
 double car_y = j[1]["y"];
