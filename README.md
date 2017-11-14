@@ -11,6 +11,8 @@
 
 ## Click [Project Rubric](https://review.udacity.com/#!/projects/318/rubric) for specifications.
 
+## [Click here for the Term3 Simulator](https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2)
+
 ## A quick overview of what a path planner does:
 A path planner acts like your friend who is sitting in the passenger seat navigating for you to help you arrive at your destination. He gives you instructions on when to get in the fast lane or when to prepare to exit the freeway. He gives you the information you need to get where you want to go and then it is your responsibility to maintain control of the vehicle by applying gas, brake, steering, etc., as well as emergency maneuvers for unexpected events. In this project, the Ego car is the car that the path is being planned for.
 
